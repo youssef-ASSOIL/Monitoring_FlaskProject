@@ -1,0 +1,19 @@
+services:
+   backend:
+    build: 
+      context: .
+    ports:
+      - "9090:8080"
+    depends_on:
+      - db
+    volumes:
+      - ./:/app
+   db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - "36000:3306"
+    volumes:
+      - ./db:/var/lib/mysql
+  
