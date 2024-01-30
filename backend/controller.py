@@ -9,7 +9,10 @@ import matplotlib
 from matplotlib import pyplot as plt
 from io import BytesIO
 
-
+# MQTT Broker settings
+MQTT_BROKER = "test.mosquitto.org"
+MQTT_PORT = 1883
+MQTT_TOPIC = "target/machine/info"
 
 app=Flask(__name__)
 matplotlib.use('agg')
@@ -52,3 +55,55 @@ def get_iot_devices():
 @app.route('/home')
 def home():
     return render_template('Home.html')
+
+from queue import Queue
+import subprocess
+import json
+
+messages = Queue()  # Shared thread-safe queue
+def handle_mqtt():
+    command = ["mosquitto_sub", "-h", "test.mosquitto.org", "-t", "target/machine/info"]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, text=True)
+    
+    try:
+        while True:
+            output = process.stdout.readline()
+            if output == '' and process.poll() is not None:
+                break
+            if output:
+                message_json = output.strip()
+                print(f"Received MQTT message: {message_json}")
+                message_data = json.loads(message_json)  # Parse the JSON message
+                temperature = float(message_data.get('temperature'))
+                mac_address = '34.95.40.18'  # Replace with actual MAC address or extract from message if included
+                datetime = message_data.get('time')
+                if temperature is not None and datetime is not None:
+                    message_info = {
+                    "temperature": temperature,
+                    "mac_address": mac_address,
+                    "datetime": datetime
+                    }
+                    messages.put(message_info)
+                    try:
+                          IotDao.insertIntoTemperature(temperature, mac_address, datetime)  # Insert into database
+                    except Exception as e:
+                        print(f"An error occurred: {e}")
+    finally:
+        process.stdout.close()
+        process.wait()
+
+@app.route('/test-iot')
+def testIOT1():
+    all_messages = []
+    while not messages.empty():
+        all_messages.append(messages.get())  # Get messages from the queue
+    return jsonify(all_messages)
+
+@app.route('/iot1dashboard')
+def dashboard():
+    return render_template('IotDashboard.html')
+
+@app.route('/get-temperature-readings')
+def get_temperature_readings():
+    data = IotDao.getAllTempReadings()
+    return jsonify(data)
