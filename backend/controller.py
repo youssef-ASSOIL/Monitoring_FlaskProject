@@ -4,7 +4,9 @@ from flask import (
     render_template,
     send_file
 )
-from dal import IotDao
+
+
+from services import IotService
 import matplotlib
 from matplotlib import pyplot as plt
 from io import BytesIO
@@ -14,10 +16,12 @@ from io import BytesIO
 app=Flask(__name__)
 matplotlib.use('agg')
 
+service = IotService()
+
 @app.route('/')
 def index():
     figure=plt.figure()
-    data=IotDao.getAllTemp()
+    data=service.getAllTemp()
     temp=[]
     dates=[]
     for id,mac,t,date,L,l in data:
@@ -33,7 +37,7 @@ def index():
 @app.route('/get-iot-devices')
 def get_iot_devices():
     # Use the IotDao to get all IoT devices from the database.
-    iot_devices = IotDao.getAllTemp()
+    iot_devices = service.getAllTemp()
 
     # Convert the devices to a JSON-serializable format
     devices_list = [
@@ -60,5 +64,5 @@ def dashboard():
 
 @app.route('/get-temperature-readings')
 def get_temperature_readings():
-    data = IotDao.getAllTempReadings()
+    data = service.getAllTempReadings()
     return jsonify(data)

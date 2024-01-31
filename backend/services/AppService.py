@@ -1,6 +1,5 @@
 
 from dal import IotDao
-from models import IoT
 from time import sleep
 import multiprocessing
 
@@ -24,8 +23,5 @@ class AppService():
         p.start()
 
     
-class IotService():
-    
-    pass
-            
+         
     

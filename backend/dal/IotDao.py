@@ -1,35 +1,28 @@
-import mysql.connector as mysql
+
 from models import IoT
 import subprocess
 import json
-class Database:
-    con = None
-    @staticmethod
-    def getConnection():
-        if Database.con is None:
-            try:
-                Database.con = mysql.connect(
-                    user='root',
-                    password='1234',
-                    database='flask_Monitoring',
-                    host='db'
-                )
-            except Exception as e:
-                print(f"Error connecting to the database: {e}")
-        return Database.con
+import mysql.connector as mysql
+from Database import Database
+
+
 class IotDao:
-    @staticmethod
-    def getAllTemp():
-        con=Database.getConnection()
+    
+    def __init__(self):
+        self.database = Database()
+    
+    
+    def getAllTemp(self):
+        con=self.database.con
         cursor=con.cursor()
         cursor.execute('SELECT * FROM iotdevices')
         return cursor.fetchall()
     
-    @staticmethod
-    def getAllDevices():
+   
+    def getAllDevices(self):
         l=[]
         try:
-            con=Database.getConnection()
+            con=self.database.con
             cursor=con.cursor()
             cursor.execute('SELECT * FROM iot_devices')
             for line in cursor.fetchall():
@@ -40,8 +33,8 @@ class IotDao:
         
         return l
     
-    @staticmethod
-    def hundle(device):
+    
+    def hundle(self,device):
         command = ["mosquitto_sub", "-h", "test.mosquitto.org", "-t", device.name, "-C", "1"]
         try:   
             result = subprocess.run(command, text=True, capture_output=True, timeout=10)
@@ -54,19 +47,20 @@ class IotDao:
                 datetime = message_data.get('time')
 
             if temperature is not None and datetime is not None:
-                IotDao.insertIntoTemperature(temperature,device.mac,datetime)
+                self.insertIntoTemperature(temperature,device.mac,datetime)
         except Exception as e:
             pass
-    @staticmethod
-    def getAllTempReadings():
-        con=Database.getConnection()
+    
+
+    def getAllTempReadings(self):
+        con=self.database.con
         cursor=con.cursor()
         cursor.execute('SELECT * FROM temperature_readings')
         return cursor.fetchall()
     
-    @staticmethod
-    def insertIntoTemperature(temperature, mac, datetime):
-        con = Database.getConnection()
+   
+    def insertIntoTemperature(self,temperature, mac, datetime):
+        con = self.database.con
         cursor = con.cursor()
         try:
             print(f"Inserting: Temperature: {temperature}, MAC: {mac}, Datetime: {datetime}")  # Debug print
@@ -76,5 +70,6 @@ class IotDao:
             print("Insertion successful")  
         except Exception as e:
             print(f"An error occurred: {e}")
-        finally:
-            con.close()  
+       
+
+

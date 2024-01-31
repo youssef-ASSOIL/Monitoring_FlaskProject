@@ -14,3 +14,20 @@ class IoT(Device):
     longitude:float
 
    
+@dataclass
+class EndDeviceInfo():
+    diskSize:int
+    diskUsage:int
+    memorySize:int
+    memoryUsage:int
+    processorLoad:list[int]
+
+
+
+@dataclass
+class EndDevice(Device):
+    id:int
+    ipAdress:str
+    infos:EndDeviceInfo
+
+
