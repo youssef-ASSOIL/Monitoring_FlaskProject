@@ -2,21 +2,28 @@ from flask import (
     Flask,
     jsonify,
     render_template,
-    send_file
+    send_file,
+    request,
 )
 
-
-from services import IotService
+from services.IotService import IotService
+from services.EndService import EndService
 import matplotlib
 from matplotlib import pyplot as plt
 from io import BytesIO
-
-
+from models import EndDevice
+from dal.EndDao import EndDao
+from dal.IotDao import IotDao
+from services.AppService import AppService
 
 app=Flask(__name__)
 matplotlib.use('agg')
 
+
+serve=AppService(IotDao(),EndDao())
+serve.start()
 service = IotService()
+serviceEnd = EndService()
 
 @app.route('/')
 def index():
@@ -66,3 +73,21 @@ def dashboard():
 def get_temperature_readings():
     data = service.getAllTempReadings()
     return jsonify(data)
+
+
+@app.route('/endDevicePage')
+def addEndDevice():
+    l=serviceEnd.getEndDevices()
+    print(l)
+    return render_template('EndDashboard.html',devices=l)
+
+
+
+@app.route('/addEndDevice',methods=["POST"])
+def test():
+    name=request.form["name"]
+    ip=request.form["ip"]
+    d=EndDevice(name,0,ip,None)
+    serviceEnd.addEndDevice(d)
+    return render_template('index.html')
+

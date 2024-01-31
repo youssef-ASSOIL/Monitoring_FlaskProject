@@ -1,4 +1,4 @@
-from dal import IotDao 
+from dal.IotDao import IotDao 
 
 class IotService():
     
@@ -10,5 +10,4 @@ class IotService():
    
     def getAllTempReadings(self):
         return self.dao.getAllTempReadings()
-    
     

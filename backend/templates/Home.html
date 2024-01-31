@@ -1,36 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Device Information</title>
-<link rel="stylesheet" href="../static/home.css">
-</head>
-<body>
-    <label for="deviceType">Type of Device:</label>
-    <select name="deviceType" id="deviceType">
-        <option value="iot">IoT</option>
-        <option value="weather">Weather</option>
-        <option value="end_device">End Device</option>
-    </select>
 
-    <table border="1" id="infoTable" style="margin-top: 20px;">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Mac</th>
-                <th>Temperature</th>
-                <th>MAC</th>
-                <th>latitude</th>
-                <th>longitude</th>
-                <!-- Add more headers as needed -->
-            </tr>
-        </thead>
-        <tbody id="infoTableBody">
-            <!-- IoT device rows will go here -->
-        </tbody>
-    </table>
+  
+    {% extends 'index.html' %}
 
-    <script src="../static/Script.js"></script>
-</body>
-</html>
+    {% block title %}Page Title{% endblock %}
+    
+    {% block content %}
+        <label for="deviceType">Type of Device:</label>
+        <select name="deviceType" id="deviceType">
+            <option value="iot">IoT</option>
+            <option value="weather">Weather</option>
+            <option value="end_device">End Device</option>
+        </select>
+
+        <table border="1" id="infoTable" style="margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Mac</th>
+                    <th>Temperature</th>
+                    <th>MAC</th>
+                    <th>latitude</th>
+                    <th>longitude</th>
+                    <!-- Add more headers as needed -->
+                </tr>
+            </thead>
+            <tbody id="infoTableBody">
+                <!-- IoT device rows will go here -->
+            </tbody>
+        </table>
+
+        <script src="../static/Script.js"></script>
+    {% endblock %}
+    

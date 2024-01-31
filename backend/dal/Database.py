@@ -7,10 +7,10 @@ class Database:
         self.con = None
         try:
             self.con = mysql.connect(
-                    user='root',
-                    password='',
+                    user='admin',
+                    password='Admin1234',
                     database='flask_Monitoring',
-                    host='localhost'
+                    host='34.95.30.36'
                 )
         except Exception as e:
             self.status = False

@@ -3,7 +3,8 @@ from models import IoT
 import subprocess
 import json
 import mysql.connector as mysql
-from Database import Database
+from dal.Database import Database
+
 
 
 class IotDao:
