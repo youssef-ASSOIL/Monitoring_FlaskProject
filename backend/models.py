@@ -22,12 +22,15 @@ class EndDeviceInfo():
     memoryUsage:int
     processorLoad:list[int]
 
+    def __init__(self):
+        self.processorLoad = []
+
 
 
 @dataclass
 class EndDevice(Device):
     id:int
     ipAdress:str
-    infos:EndDeviceInfo
+    infos:dict
 
 

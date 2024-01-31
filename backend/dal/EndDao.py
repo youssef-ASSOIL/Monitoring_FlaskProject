@@ -13,12 +13,21 @@ class EndDao:
     
     def hundle(self,device):
         ip=device.ipAdress
-        print("rr")
+        
         disk=self.getDiskInfo(ip)
         ram=self.getRamInfo(ip)
         pr=self.getProcessorInfo(ip)
-        print(ip)
-        print(disk,ram,pr)
+        if ram != []:
+            print("1")
+            infos=EndDeviceInfo()
+            infos.diskSize = disk[0]
+            infos.diskUsage = disk[1]
+            infos.memorySize = ram[0]
+            infos.memoryUsage = ram[1]
+            infos.processorLoad = pr
+            device.infos[""]= infos
+            self.addEndDeviceInfo(device)
+     
     
 
     def addEndDevice(self,device):
@@ -37,23 +46,47 @@ class EndDao:
     def addEndDeviceInfo(self,device):
         con = self.database.con
         cursor = con.cursor()
-
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         l="("
-        for e in device.infos.processorLoad:
-            l+= f" {e} , {device.id} ) ,("
+        for e in device.infos[""].processorLoad:
+            l+= f" {e} , {device.id} , '{now}' ) ,("
 
         l=l[:-2]
+        print(l)
         try:
             cursor.execute('INSERT INTO DeviceInfo (disksize, diskusage, memorysize, memoryusage, datetime, deviceid ) VALUES (%s, %s, %s, %s, %s,%s)',
-                           (device.infos.diskSize,device.infos.diskUsage,device.infos.memorySize,device.infos.memoryUsage,datetime.now().strftime("%Y-%m-%d %H:%M:%S"),device.id))
+                           (device.infos[""].diskSize,device.infos[""].diskUsage,device.infos[""].memorySize,device.infos[""].memoryUsage,now,device.id))
             con.commit()  
 
-            cursor.execute(f'INSERT INTO Processor (processorload, deviceid) VALUES {l}')
+            cursor.execute(f'INSERT INTO Processor (processorload, deviceid,datetime) VALUES {l}')
             con.commit()  
-            return device
+            print("ok")
         except Exception as e:
-            return None
+            print(e)
         
+        return device
+        
+    def getDeviceInfo(self,id):
+        l={}
+        con = self.database.con
+        cursor = con.cursor()
+        query=f"select * from EndDevice,Processor,DeviceInfo where Processor.deviceid = EndDevice.id and DeviceInfo.deviceid = EndDevice.id and Processor.datetime = DeviceInfo.datetime and EndDevice.id = {id}  ;"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        d=EndDevice(result[0][1],id,result[0][2],{})
+        for line in result:
+            if line[6] in d.infos:
+
+                d.infos[line[6]].processorLoad.append(int(line[4]))
+            else:
+                deviceinfo = EndDeviceInfo()
+                deviceinfo.diskSize = int(line[8])
+                deviceinfo.diskUsage = int(line[9])
+                deviceinfo.memorySize = int(line[10])
+                deviceinfo.memoryUsage = int(line[11])
+                deviceinfo.processorLoad.append(int(line[4]))
+                d.infos[line[6]] = deviceinfo
+        return d
 
         
     def getAllEndDevices(self):
@@ -64,7 +97,7 @@ class EndDao:
         cursor.execute(query)
         result = cursor.fetchall()
         for line in result:
-            l.append(EndDevice(line[1],int(line[0]),line[2],None))
+            l.append(EndDevice(line[1],int(line[0]),line[2],{}))
         return l
         '''
         for line in result:

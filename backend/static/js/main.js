@@ -1,11 +1,20 @@
+try {
+    document.getElementById('toggleaddend').addEventListener('click', function() {
+        document.getElementById('addend').style.display =   document.getElementById('addend').style.display == 'block' ? 'none' : 'block';
+    });
+} catch (error) {
+    
+}
 
 
-document.getElementById('toggleaddend').addEventListener('click', function() {
-    document.getElementById('addend').style.display =   document.getElementById('addend').style.display == 'block' ? 'none' : 'block';
-});
+
+
+
+
 
 (function ($) {
     "use strict";
+
 
     // Spinner
     var spinner = function () {
@@ -17,7 +26,7 @@ document.getElementById('toggleaddend').addEventListener('click', function() {
     };
     spinner();
     
-    
+   
     // Back to top button
     $(window).scroll(function () {
         if ($(this).scrollTop() > 300) {
@@ -45,39 +54,104 @@ document.getElementById('toggleaddend').addEventListener('click', function() {
     Chart.defaults.borderColor = "#000000";
 
 
-    // Worldwide Sales Chart
-    var ctx1 = $("#worldwide-sales").get(0).getContext("2d");
-    var myChart1 = new Chart(ctx1, {
-        type: "bar",
-        data: {
-            labels: ["2016", "2017", "2018", "2019", "2020", "2021", "2022"],
-            datasets: [{
-                    label: "USA",
-                    data: [15, 30, 55, 65, 60, 80, 95],
-                    backgroundColor: "rgba(235, 22, 22, .7)"
-                },
-                {
-                    label: "UK",
-                    data: [8, 35, 40, 60, 70, 55, 75],
-                    backgroundColor: "rgba(235, 22, 22, .5)"
-                },
-                {
-                    label: "AU",
-                    data: [12, 25, 45, 55, 65, 70, 60],
-                    backgroundColor: "rgba(235, 22, 22, .3)"
-                }
-            ]
-            },
-        options: {
-            responsive: true
-        }
-    });
 
+    async function fetchDataAndRenderChart() {
+        try {
+            const id = $("#id").val(); // Assuming you have jQuery loaded
+    
+            // Fetch the data from your endpoint
+            const response = await fetch('/GetInfoEndDevice/' + id);
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            // Assuming your server responds with JSON data
+            const data = await response.json();
+    
+            // Process and plot the data
+            console.log(data);
+            load(data)
+        } catch (error) {
+            console.error('Could not fetch data from /GetInfoEndDevice:', error);
+        }
+    }
+    
+    // Ensure the DOM is ready before calling the function
+    $(document).ready(function () {
+        fetchDataAndRenderChart();
+    });
+    
+    
+    function load(data) {
+        document.getElementById('heredisk').innerText =  data[1][0].diskSize
+        document.getElementById('hereram').innerText =  data[1][0].memorySize
+        document.getElementById('hereproc').innerText =  data[1][0].processorLoad.length
+       
+       
+
+        var ctx1 = $("#disk-plot").get(0).getContext("2d");
+        var myChart1 = new Chart(ctx1, {
+            type: "bar",
+            data: {
+                labels: data[0].slice(-10),
+                datasets: [{
+                        label: "Disk Usage",
+                        data: data[1].slice(-10).map(e => e.diskUsage),
+                        backgroundColor: "rgba(235, 22, 22, .7)"
+                    }
+                
+                ]
+                },
+            options: {
+                responsive: true
+            }
+        });
+
+        var ctx2 = $("#ram-plot").get(0).getContext("2d");
+        var myChart1 = new Chart(ctx2, {
+            type: "line",
+            data: {
+                labels: data[0].slice(-10),
+                datasets: [{
+                        label: "Memory Usage",
+                        data: data[1].slice(-10).map(e => e.memoryUsage),
+                        backgroundColor: "rgba(235, 22, 22, .7)"
+                    }
+                
+                ]
+                },
+            options: {
+                responsive: true
+            }
+        });
+
+        let d = data[1][0].processorLoad.map( (e,index) => ({
+            label : "process " + index+1,
+            data: data[1].slice(-100).map(e => e.processorLoad[index]),
+            backgroundColor: "rgba(235, 22, 22, .7)"
+        }))
+        console.log(d)
+        var ctx3 = $("#proc-plot").get(0).getContext("2d");
+        var myChart1 = new Chart(ctx3, {
+            type: "line",
+            data: {
+                labels: data[0].slice(-100),
+                datasets: d
+                },
+            options: {
+                responsive: true
+            }
+        });
+
+     
+    }
+
+    
 
    
 
     
-
     
 })(jQuery);
 

@@ -26,6 +26,9 @@ class EndService:
 
     def getEndDevices(self):
         return self.dao.getAllEndDevices()
+    
+    def getDeviceInfo(self,id):
+        return self.dao.getDeviceInfo(id)
         
     
     

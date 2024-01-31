@@ -1,3 +1,4 @@
+import json
 from flask import (
     Flask,
     jsonify,
@@ -11,7 +12,7 @@ from services.EndService import EndService
 import matplotlib
 from matplotlib import pyplot as plt
 from io import BytesIO
-from models import EndDevice
+from models import EndDevice,EndDeviceInfo
 from dal.EndDao import EndDao
 from dal.IotDao import IotDao
 from services.AppService import AppService
@@ -87,7 +88,23 @@ def addEndDevice():
 def test():
     name=request.form["name"]
     ip=request.form["ip"]
-    d=EndDevice(name,0,ip,None)
+    d=EndDevice(name,0,ip,{})
     serviceEnd.addEndDevice(d)
     return render_template('index.html')
+
+
+@app.route('/InfoEndDevice/<int:end_device_id>')
+def InfoEndDevice(end_device_id):
+    return render_template('InfoEndDevicePage.html',id=end_device_id)
+
+
+@app.route('/GetInfoEndDevice/<int:end_device_id>')
+def GetInfoEndDevice(end_device_id):
+    d=serviceEnd.getDeviceInfo(end_device_id)
+    l=[[],[]]
+    for k,v in d.infos.items():
+        l[0].append(k)
+        l[1].append(v)
+    print(l)
+    return jsonify(l)
 
