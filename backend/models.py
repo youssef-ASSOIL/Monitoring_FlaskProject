@@ -13,6 +13,9 @@ class IoT(Device):
     latitude:float
     longitude:float
 
+@dataclass
+class City(Device):
+        id:int
    
 @dataclass
 class EndDeviceInfo():

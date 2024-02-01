@@ -17,6 +17,10 @@ from models import EndDevice,EndDeviceInfo,IoT
 from dal.EndDao import EndDao
 from dal.IotDao import IotDao
 from services.AppService import AppService
+from services.CityService import CityService
+
+cityService=CityService()
+
 
 app=Flask(__name__)
 matplotlib.use('agg')
@@ -107,3 +111,18 @@ def GetInfoEndDevice(end_device_id):
     print(l)
     return jsonify(l)
 
+@app.route('/addCity',methods=["POST"])
+def addCity():
+    name=request.form["name"]
+    cityService.AddCity(name)
+    return render_template('City.html')
+
+@app.route('/getCityinfo/<int:id>',methods=["POST"])
+def getCityinfo():
+    name=request.form["name"]
+    cityService.getCityById(id)
+    return render_template('infoCity.html')
+
+@app.route('/getCityinfo')
+def getCityinfo2():
+    return render_template('infoCity.html',id=id)

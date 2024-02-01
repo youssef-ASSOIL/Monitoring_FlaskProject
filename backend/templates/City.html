@@ -1,0 +1,63 @@
+
+  
+    {% extends 'index.html' %}
+
+    {% block title %}Page Title{% endblock %}
+    
+    {% block content %}
+
+    
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-secondary text-center rounded p-4 m-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">Recent Salse</h6>
+                <a href="">Show All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr class="text-white">
+                            <th scope="col">id</th>
+                            <th scope="col">name</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in devices %}
+                        <tr>
+                            <td>{{l.id}}</td>
+                            <td>{{l.name}}</td>
+                            <td><a href='/getCityinfo/{{l.id}}'  class="btn btn-dark ms-2">info</a></td>
+                        </tr>
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>        
+
+
+        <div class="row">
+            <div class="col-6">
+                <button type="button" class="btn btn-primary ms-2" id="toggleaddend">Add</button>
+            </div>
+            <div class="col-6" id="addend" style="display: none;">
+                <div class="bg-secondary rounded h-100 p-4">
+                    <h6 class="mb-4">Add end Device</h6>
+                    <form action="/addCity" method="post">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            
+                        </div>
+                       
+                        <button type="submit" class="btn btn-primary">add</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% endblock %}
+    
