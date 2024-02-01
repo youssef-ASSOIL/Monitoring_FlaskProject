@@ -5,6 +5,7 @@ from flask import (
     render_template,
     send_file,
     request,
+    redirect
 )
 
 from services.IotService import IotService
@@ -12,7 +13,7 @@ from services.EndService import EndService
 import matplotlib
 from matplotlib import pyplot as plt
 from io import BytesIO
-from models import EndDevice,EndDeviceInfo
+from models import EndDevice,EndDeviceInfo,IoT
 from dal.EndDao import EndDao
 from dal.IotDao import IotDao
 from services.AppService import AppService
@@ -44,23 +45,9 @@ def index():
 
 @app.route('/get-iot-devices')
 def get_iot_devices():
-    # Use the IotDao to get all IoT devices from the database.
-    iot_devices = service.getAllTemp()
-
-    # Convert the devices to a JSON-serializable format
-    devices_list = [
-        {
-            'id': device[0],  
-            'mac': device[1], 
-            'temp': device[2],  
-            'datetime': device[3], 
-            'latitude': device[4],
-            'longitude': device[5]
-        } for device in iot_devices
-    ]
-
-    # Return the list of devices as JSON
-    return jsonify(devices_list)
+    iot_devices = service.getAllDevices()
+    
+    return render_template("IotHome.html",devices=iot_devices)
 @app.route('/home')
 def home():
     return render_template('Home.html')
@@ -70,9 +57,10 @@ def home():
 def dashboard():
     return render_template('IotDashboard.html')
 
-@app.route('/get-temperature-readings')
-def get_temperature_readings():
-    data = service.getAllTempReadings()
+@app.route('/get-temperature-readings/<string:iot_device_mac>')
+def get_temperature_readings(iot_device_mac):
+    data = service.getAllTempReadings(iot_device_mac)
+    print(data,"-------------------------")
     return jsonify(data)
 
 
@@ -82,6 +70,17 @@ def addEndDevice():
     print(l)
     return render_template('EndDashboard.html',devices=l)
 
+@app.route('/addIotDevice',methods=["POST"])
+def addIotDevice():
+    name=request.form["name"]
+    d=IoT(name,None,None,None,None,None)
+    service.addIotDevice(d)
+    return redirect('/get-iot-devices')
+
+
+@app.route('/InfoIot/<string:iot_device_id>')
+def InfoIot(iot_device_id):
+    return render_template('InfoIotDevicePage.html',id=iot_device_id)
 
 
 @app.route('/addEndDevice',methods=["POST"])

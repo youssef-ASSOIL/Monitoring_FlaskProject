@@ -16,7 +16,7 @@ class IotDao:
     def getAllTemp(self):
         con=self.database.con
         cursor=con.cursor()
-        cursor.execute('SELECT * FROM iotdevices')
+        cursor.execute('SELECT * FROM iot_devices,temperature_readings where iot_devices.mac = temperature_readings.mac ')
         return cursor.fetchall()
     
    
@@ -53,10 +53,10 @@ class IotDao:
             pass
     
 
-    def getAllTempReadings(self):
+    def getAllTempReadings(self,mac):
         con=self.database.con
         cursor=con.cursor()
-        cursor.execute('SELECT * FROM temperature_readings')
+        cursor.execute(f'SELECT * FROM temperature_readings where mac = "{mac}" ;')
         return cursor.fetchall()
     
    
@@ -74,3 +74,28 @@ class IotDao:
        
 
 
+    def addIotDevice(self,d):
+        con = self.database.con
+        cursor = con.cursor()
+        print("++++++++++++++++++")
+        command = ["mosquitto_sub", "-h", "test.mosquitto.org", "-t", d.name, "-C", "1"]
+        try:   
+            result = subprocess.run(command, text=True, capture_output=True, timeout=10)
+            print(result)
+            if result.returncode == 0 and result.stdout:
+                        
+                message_json = result.stdout.strip()
+                message_data = json.loads(message_json)  
+                latitude=message_data.get('latitude')
+                longitude=message_data.get('longitude')
+                mac=message_data.get('mac')
+                print("//////////////////")
+                print(latitude,longitude,mac)
+            if latitude is not None and longitude is not None:
+                
+                cursor.execute('INSERT INTO iot_devices (name,latitude,longitude,mac) VALUES (%s, %s,%s, %s)',(d.name, latitude,longitude,mac))
+                con.commit() 
+                d.id = cursor.lastrowid 
+        except Exception as e:
+            pass
+      

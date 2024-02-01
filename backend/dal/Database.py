@@ -10,7 +10,7 @@ class Database:
                     user='admin',
                     password='Admin1234',
                     database='flask_Monitoring',
-                    host='34.95.30.36'
+                    host='35.203.112.244'
                 )
         except Exception as e:
             self.status = False

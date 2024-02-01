@@ -12,7 +12,7 @@ class EndService:
     
     def addEndDevice(self,device) :
         
-        result = self.dao.getFrom(device.ipAdress)
+        result = self.dao.getFrom(device.ipAdress,"")
         if result != "" :
             d=self.dao.addEndDevice(device)
             if d == None:
