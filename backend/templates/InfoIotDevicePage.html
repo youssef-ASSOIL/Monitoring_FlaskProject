@@ -5,7 +5,7 @@
     {% block title %}Page Title{% endblock %}
     
     {% block content %}
-      
+     
 
       <input type="text" value="{{id}}" id="id" hidden>
 
@@ -25,14 +25,27 @@
                 </div>
 
                
-                </div>
+            </div>
+
+            
+           
                
             </div>
+           
         </div>
 
+       
         
     </div>
 
-    <script src="{{ url_for('static', filename='ss.js') }}"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <script src="{{ url_for('static', filename='lib/chart/chart.min.js') }}"></script>
+    
+    <script src="{{ url_for('static', filename='iot.js') }}"></script>
     {% endblock %}
     
+
+
+   

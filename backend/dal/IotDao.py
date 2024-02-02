@@ -64,7 +64,7 @@ class IotDao:
         con = self.database.con
         cursor = con.cursor()
         try:
-            print(f"Inserting: Temperature: {temperature}, MAC: {mac}, Datetime: {datetime}")  # Debug print
+            print(f"Inserting: Temperature: {temperature}, MAC: {mac}, Datetime: {datetime}") 
             cursor.execute('INSERT INTO temperature_readings (temperature, mac, datetime) VALUES (%s, %s, %s)',
                            (temperature, mac, datetime))
             con.commit()  

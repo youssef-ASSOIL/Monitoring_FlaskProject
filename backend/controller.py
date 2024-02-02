@@ -33,25 +33,21 @@ serviceEnd = EndService()
 
 @app.route('/')
 def index():
-    figure=plt.figure()
-    data=service.getAllTemp()
-    temp=[]
-    dates=[]
-    for id,mac,t,date,L,l in data:
-        temp.append(t)
-        dates.append(date)
-    plt.plot(dates,temp)
-    img=BytesIO()
-    figure.savefig(img)
-    img.seek(0)
-    return send_file(img,mimetype='image/png')
-
+    return render_template("index.html")
 
 @app.route('/get-iot-devices')
 def get_iot_devices():
     iot_devices = service.getAllDevices()
     
     return render_template("IotHome.html",devices=iot_devices)
+
+@app.route('/get-iot-ds')
+def get_iot_ds():
+    iot_devices = service.getAllDevices()
+    l=[]
+    for d in iot_devices:
+        l.append([d.latitude,d.longitude])
+    return jsonify(l)
 @app.route('/home')
 def home():
     return render_template('Home.html')
@@ -93,7 +89,7 @@ def test():
     ip=request.form["ip"]
     d=EndDevice(name,0,ip,{})
     serviceEnd.addEndDevice(d)
-    return render_template('index.html')
+    return redirect("/endDevicePage")
 
 
 @app.route('/InfoEndDevice/<int:end_device_id>')
@@ -115,14 +111,25 @@ def GetInfoEndDevice(end_device_id):
 def addCity():
     name=request.form["name"]
     cityService.AddCity(name)
-    return render_template('City.html')
+    return redirect("/getCities")
 
-@app.route('/getCityinfo/<int:id>',methods=["POST"])
-def getCityinfo():
-    name=request.form["name"]
-    cityService.getCityById(id)
-    return render_template('infoCity.html')
+@app.route('/getCityinfo/<int:id>')
+def getCityinfo(id):
+    print("////////////")
+    l=cityService.getCityById(id)
+    print(l)
+    return jsonify(l)
 
-@app.route('/getCityinfo')
-def getCityinfo2():
+@app.route('/getCityinfoPage/<int:id>')
+def getCityinfo2(id):
     return render_template('infoCity.html',id=id)
+
+@app.route('/getCities')
+def getCityinfos():
+    r=cityService.getAllCity()
+    return render_template('City.html',devices=r)
+
+
+@app.route('/getMap')
+def getMap():
+    return render_template('map.html')

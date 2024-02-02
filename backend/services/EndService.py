@@ -11,8 +11,9 @@ class EndService:
     dao:EndDao=EndDao()
     
     def addEndDevice(self,device) :
-        
-        result = self.dao.getFrom(device.ipAdress,"")
+        print("*************")
+        result = self.dao.getFrom(device.ipAdress,"1.3.6.1.2.1.25.2.3")
+        print("----------------",result)
         if result != "" :
             d=self.dao.addEndDevice(device)
             if d == None:

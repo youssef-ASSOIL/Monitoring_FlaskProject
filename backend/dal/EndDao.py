@@ -73,6 +73,7 @@ class EndDao:
         query=f"select * from EndDevice,Processor,DeviceInfo where Processor.deviceid = EndDevice.id and DeviceInfo.deviceid = EndDevice.id and Processor.datetime = DeviceInfo.datetime and EndDevice.id = {id}  ;"
         cursor.execute(query)
         result = cursor.fetchall()
+        print(result)
         d=EndDevice(result[0][1],id,result[0][2],{})
         for line in result:
             if line[6] in d.infos:
@@ -99,13 +100,7 @@ class EndDao:
         for line in result:
             l.append(EndDevice(line[1],int(line[0]),line[2],{}))
         return l
-        '''
-        for line in result:
-                id=int(line[0])
-                i=EndDeviceInfo(int(line[]),int(line[]),int(line[]),int(line[]),getEndDeviceProcessors(id))
-                l.append(EndDevice(id,line[],i))
-        return l
-        '''
+     
     
     def getEndDeviceProcessors(self,id):
         r=[]
@@ -124,7 +119,6 @@ class EndDao:
     def getFrom(self,ip,oid):
         try:
             self.snmp_output=""
-           
             tmp = subprocess.check_output(["snmpwalk", "-v2c", "-c", "public", ip ,oid ])
             tmp = tmp.decode("utf-8")
             self.snmp_output = tmp

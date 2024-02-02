@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IoT Device Map</title>
+    <style>
+        /* Set the size of the map */
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <!-- Include Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBPd7wHBMHuqx_Sinvfjz-DDw0BIcFz3s&callback=initMap"></script>
+</head>
+<body>
+    <h3>IoT Device Locations</h3>
+    <!-- The map container -->
+    <div id="map"></div>
+
+    <script>
+        // The function to initialize the map
+
+        async function fetchDataAndRenderChart1() {
+            try {
+                const id = $("#id").val(); // Assuming you have jQuery loaded
+
+                const response = await fetch('/get-iot-ds');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Assuming your server responds with JSON data
+                const data = await response.json();
+                console.log("aaaa", data);
+
+                // Call the function to initialize the map with the retrieved data
+                initMap(data);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function initMap(deviceLocations) {
+            // The map, centered at the first device's location
+            var map = new google.maps.Map(
+                document.getElementById('map'), {zoom: 8, center: new google.maps.LatLng(deviceLocations[0][0], deviceLocations[0][1])});
+
+            // Adding a marker for each device location
+            deviceLocations.forEach(function(location) {
+                var marker = new google.maps.Marker({position: new google.maps.LatLng(location[0], location[1]), map: map});
+            });
+        }
+
+        // Call the fetchDataAndRenderChart1 function when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchDataAndRenderChart1();
+        });
+    </script>
+</body>
+</html>

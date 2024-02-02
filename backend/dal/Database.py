@@ -12,5 +12,5 @@ class Database:
                     database='flask_Monitoring',
                     host='35.203.112.244'
                 )
-        except Exception as e:
+        except:
             self.status = False
